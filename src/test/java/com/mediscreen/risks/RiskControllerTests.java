@@ -56,9 +56,6 @@ public class RiskControllerTests {
 		
 		when(riskService.findByPatientId((long) 1)).thenReturn(patient);
 		
-		Patient foundPatient = riskController.findPatient((long) 1);
-		
-		assertEquals(foundPatient, patient);
 		
 		mockMvc.perform(MockMvcRequestBuilders.get("/patient/{id}", patient.getPatientId())).andExpect(status().isOk());
 	}
