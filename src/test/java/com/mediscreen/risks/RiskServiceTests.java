@@ -17,8 +17,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import com.mediscreen.entities.Note;
 import com.mediscreen.entities.Patient;
-import com.mediscreen.repository.RiskNoteRepository;
-import com.mediscreen.repository.RiskPatientRepository;
+import com.mediscreen.proxies.RiskNoteProxy;
+import com.mediscreen.proxies.RiskPatientProxy;
 import com.mediscreen.services.RiskService;
 import com.mediscreen.services.RiskServiceImpl;
 
@@ -26,16 +26,16 @@ import com.mediscreen.services.RiskServiceImpl;
 public class RiskServiceTests {
 	
 	@MockBean
-	private RiskNoteRepository riskNoteRepository;
+	private RiskNoteProxy riskNoteProxy;
 	
 	@MockBean
-	private RiskPatientRepository riskPatientRepository;
+	private RiskPatientProxy riskPatientProxy;
 	
 	private RiskService riskService;
 	
 	@BeforeEach
 	public void setUp() {
-		riskService = new RiskServiceImpl(riskNoteRepository, riskPatientRepository);
+		riskService = new RiskServiceImpl(riskPatientProxy, riskNoteProxy);
 	}
 	
 	
@@ -70,10 +70,10 @@ public class RiskServiceTests {
 		notesPatient2.add(note2);
 		
 		
-		when(riskPatientRepository.findByPatientId((long) 1)).thenReturn(patient1);
-		when(riskPatientRepository.findByPatientId((long) 2)).thenReturn(patient2);
-		when(riskNoteRepository.findAllByPatientId("1")).thenReturn(notesPatient1);
-		when(riskNoteRepository.findAllByPatientId("2")).thenReturn(notesPatient2);
+		when(riskPatientProxy.findPatient((long) 1)).thenReturn(patient1);
+		when(riskPatientProxy.findPatient((long) 2)).thenReturn(patient2);
+		when(riskNoteProxy.findNoteByPatientId("1")).thenReturn(notesPatient1);
+		when(riskNoteProxy.findNoteByPatientId("2")).thenReturn(notesPatient2);
 		
 		String riskPatient1 = riskService.evaluateRisk((long) 1);
 		String riskPatient2 = riskService.evaluateRisk((long) 2);
@@ -90,13 +90,13 @@ public class RiskServiceTests {
 		patient.setFirstName("firstname");
 		patient.setPatientId((long) 1);
 		
-		when(riskPatientRepository.findByPatientId(Mockito.anyLong())).thenReturn(patient);
+		when(riskPatientProxy.findPatient(Mockito.anyLong())).thenReturn(patient);
 		
 		Patient foundPatient = riskService.findByPatientId((long) 1);
 		
 		assertNotNull(foundPatient);
 		assertEquals(foundPatient.getFirstName(), "firstname");
-		verify(riskPatientRepository).findByPatientId(Mockito.anyLong());
+		verify(riskPatientProxy).findPatient(Mockito.anyLong());
 	}
 	
 

@@ -9,18 +9,18 @@ import org.springframework.stereotype.Service;
 
 import com.mediscreen.entities.Note;
 import com.mediscreen.entities.Patient;
-import com.mediscreen.repository.RiskNoteRepository;
-import com.mediscreen.repository.RiskPatientRepository;
+import com.mediscreen.proxies.RiskNoteProxy;
+import com.mediscreen.proxies.RiskPatientProxy;
 
 @Service
 public class RiskServiceImpl implements RiskService {
 	
-	private final RiskNoteRepository riskNoteRepository;
-	private final RiskPatientRepository riskPatientRepository;
+	private final RiskPatientProxy riskPatientProxy;
+	private final RiskNoteProxy riskNoteProxy;
 	
-	public RiskServiceImpl(RiskNoteRepository riskNoteRepository, RiskPatientRepository riskPatientRepository) {
-		this.riskNoteRepository = riskNoteRepository;
-		this.riskPatientRepository = riskPatientRepository;
+	public RiskServiceImpl(RiskPatientProxy riskPatientProxy, RiskNoteProxy riskNoteProxy) {
+		this.riskPatientProxy = riskPatientProxy;
+		this.riskNoteProxy = riskNoteProxy;
 	}
 	
 
@@ -34,13 +34,13 @@ public class RiskServiceImpl implements RiskService {
 	@Override
 	public Patient findByPatientId(Long id) {
 		
-		return riskPatientRepository.findByPatientId(id);
+		return riskPatientProxy.findPatient(id);
 	}
 	
 	
 	private List<Note> getPatientNotes(String patientId) {
 			
-		return riskNoteRepository.findAllByPatientId(patientId);
+		return riskNoteProxy.findNoteByPatientId(patientId);
 	}
 	
 	
