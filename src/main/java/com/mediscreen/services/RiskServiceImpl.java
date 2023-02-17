@@ -52,7 +52,7 @@ public class RiskServiceImpl implements RiskService {
 		
 		for(int i = 0; i < patientNotes.size(); i++) {
 			for(int j = 0; j < dangerTermsList.size(); j++) {
-				if( patientNotes.get(i).getPractitionnerNote().toLowerCase().contains(dangerTermsList.get(j).toLowerCase()) ) {
+				if( patientNotes.get(i).getPractitionnerNotes().toLowerCase().contains(dangerTermsList.get(j).toLowerCase()) ) {
 					danger++;
 				}
 			}

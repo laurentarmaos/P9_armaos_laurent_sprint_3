@@ -52,7 +52,7 @@ public class RiskServiceTests {
 		
 		Note note1 = new Note();
 		note1.setPatientId("1");
-		note1.setPractitionnerNote("fumeur, Hémoglobine A1C, Microalbumine");
+		note1.setPractitionnerNotes("fumeur, Hémoglobine A1C, Microalbumine");
 		List<Note> notesPatient1 = new ArrayList<>();
 		notesPatient1.add(note1);
 		
@@ -65,7 +65,7 @@ public class RiskServiceTests {
 		
 		Note note2 = new Note();
 		note2.setPatientId("2");
-		note2.setPractitionnerNote("fumeur, Hémoglobine A1C, Microalbumine, Rechute, vertige");
+		note2.setPractitionnerNotes("fumeur, Hémoglobine A1C, Microalbumine, Rechute, vertige");
 		List<Note> notesPatient2 = new ArrayList<>();
 		notesPatient2.add(note2);
 		
