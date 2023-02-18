@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RiskServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Mediscreen_risks</a> &gt; <a href="index.source.html" class="el_package">com.mediscreen.services</a> &gt; <span class="el_source">RiskServiceImpl.java</span></div><h1>RiskServiceImpl.java</h1><pre class="source lang-java linenums">package com.mediscreen.services;
+
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.mediscreen.entities.Note;
+import com.mediscreen.entities.Patient;
+import com.mediscreen.proxies.RiskNoteProxy;
+import com.mediscreen.proxies.RiskPatientProxy;
+
+@Service
+public class RiskServiceImpl implements RiskService {
+	
+	private final RiskPatientProxy riskPatientProxy;
+	private final RiskNoteProxy riskNoteProxy;
+	
+<span class="fc" id="L21">	public RiskServiceImpl(RiskPatientProxy riskPatientProxy, RiskNoteProxy riskNoteProxy) {</span>
+<span class="fc" id="L22">		this.riskPatientProxy = riskPatientProxy;</span>
+<span class="fc" id="L23">		this.riskNoteProxy = riskNoteProxy;</span>
+<span class="fc" id="L24">	}</span>
+	
+
+	@Override
+	public String evaluateRisk(Long patientId) {	
+		
+<span class="fc" id="L30">		return riskLevel(patientId);</span>
+	}
+	
+	
+	@Override
+	public Patient findByPatientId(Long id) {
+		
+<span class="fc" id="L37">		return riskPatientProxy.findPatient(id);</span>
+	}
+	
+	
+	private List&lt;Note&gt; getPatientNotes(String patientId) {
+			
+<span class="fc" id="L43">		return riskNoteProxy.findNoteByPatientId(patientId);</span>
+	}
+	
+	
+	private int termsOccurrence(String patientId) {
+<span class="fc" id="L48">		int danger = 0;</span>
+<span class="fc" id="L49">		String[] dangerTerms = {&quot;Hémoglobine A1C&quot;, &quot;Microalbumine&quot;, &quot;Taille&quot;, &quot;Poids&quot;, &quot;Fumeur&quot;, &quot;Anormal&quot;, &quot;Cholestérol&quot;, &quot;Vertige&quot;, &quot;Rechute&quot;, &quot;Réaction&quot;, &quot;Anticorps&quot;};</span>
+<span class="fc" id="L50">		List&lt;String&gt; dangerTermsList = Arrays.asList(dangerTerms);</span>
+<span class="fc" id="L51">		List&lt;Note&gt; patientNotes = getPatientNotes(patientId);</span>
+		
+<span class="fc bfc" id="L53" title="All 2 branches covered.">		for(int i = 0; i &lt; patientNotes.size(); i++) {</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">			for(int j = 0; j &lt; dangerTermsList.size(); j++) {</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">				if( patientNotes.get(i).getPractitionnerNotes().toLowerCase().contains(dangerTermsList.get(j).toLowerCase()) ) {</span>
+<span class="fc" id="L56">					danger++;</span>
+				}
+			}
+		}
+		
+<span class="fc" id="L61">		return danger;</span>
+	}
+	
+	
+	
+	
+	private String riskLevel(Long patientId) {
+<span class="fc" id="L68">		String riskLevel = &quot;not determined&quot;;</span>
+<span class="fc" id="L69">		Patient patient = findByPatientId(patientId);</span>
+<span class="fc" id="L70">		LocalDate dateNow = LocalDate.now();</span>
+<span class="fc" id="L71">		int age = Period.between(patient.getBirthDate(), dateNow).getYears();</span>
+<span class="fc" id="L72">		int danger = termsOccurrence(patientId.toString());</span>
+		
+		
+<span class="pc bpc" id="L75" title="9 of 16 branches missed.">		if( (age &lt; 30 &amp;&amp; danger &gt;= 5 &amp;&amp; patient.getGender().equals(&quot;M&quot;)) || (age &lt; 30 &amp;&amp; danger &gt;= 7 &amp;&amp; patient.getGender().equals(&quot;F&quot;)) || (danger &gt;= 8 &amp;&amp; age &gt;= 30) ) {</span>
+<span class="nc" id="L76">			riskLevel = &quot;Early onset&quot;;</span>
+<span class="pc bpc" id="L77" title="10 of 16 branches missed.">		} else if( (age &lt; 30 &amp;&amp; danger &gt;= 3 &amp;&amp; patient.getGender().equals(&quot;M&quot;)) || (age &lt; 30 &amp;&amp; danger &gt;= 4 &amp;&amp; patient.getGender().equals(&quot;F&quot;)) || (danger &gt;= 6 &amp;&amp; age &gt;= 30) ) {</span>
+<span class="fc" id="L78">			riskLevel = &quot;In Danger&quot;;</span>
+<span class="pc bpc" id="L79" title="2 of 4 branches missed.">		} else if( (age &gt;= 30 &amp;&amp; danger &gt;= 2) ) {</span>
+<span class="fc" id="L80">			riskLevel = &quot;Borderline&quot;;</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">		} else if(danger == 2) {</span>
+<span class="nc" id="L82">			riskLevel = &quot;None&quot;;</span>
+		}
+		
+
+<span class="fc" id="L86">		return riskLevel + &quot; (risks triggers: &quot;+ danger + &quot;)&quot;;</span>
+	}
+
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
